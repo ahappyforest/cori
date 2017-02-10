@@ -104,7 +104,12 @@ static int l_run(lua_State *L)
 	ev_signal_start(loop, &signal_watcher_stop);
 
 	tapfd = tun_alloc("tap0");
-	assert(tapfd > 0);
+	if (tapfd < 0) {
+		fprintf(stderr, "%s\n", strerror(errno));
+		ev_default_destroy();
+		return 0;
+	}
+
 	tap_config("tap0", "192.168.100.1", "255.255.255.0");
 
 	ev_run(loop, 0);
